@@ -1,8 +1,16 @@
 #include <stdio.h>
+#define CHOICE_HAPPY_FACE 1
+#define CHOICE_BALANCED 2
+#define CHOICE_GENEROUS 3
+#define CHOICE_CIRCLE_OF_JOY 4
+#define CHOICE_HAPPY_NUMBERS 5
+#define CHOICE_LAUGHTER 6
+#define CHOICE_EXIT 7
 
 int main() {
-	int choice = 0, bufferEmpty;
-	while (choice != 7) {
+	int choice = 0;
+	while (choice != CHOICE_EXIT) {
+		// Print menu
 		printf("\tChoose an option:\n");
 		printf("\t1. Happy Face\n");
 		printf("\t2. Balanced Number\n");
@@ -12,14 +20,13 @@ int main() {
 		printf("\t6. Festival Of Laughter\n");
 		printf("\t7. Exit\n");
 
+		// Get user's choice
 		scanf("%d", &choice);
+
 		// Clear buffer
-		do {
-			// Separated these to two lines, since putting them in one line causes an infinite loop when only
-			// \n is entered
-			bufferEmpty = scanf("%*[^\n]");
-			scanf("%*c");
-		} while (bufferEmpty == -1);
+		scanf("%*[^\n]");
+		scanf("%*c");
+
 		// Using "if" instead of "switch" since CLion does not know how to fold the code, and indent comments correctly,
 		// making it uncomfortable to use. (Reported in RSCPP-35914)
 		// -----------------------------
@@ -30,9 +37,9 @@ int main() {
 		*   o
 		* \___/
 		*/
-		if (choice == 1) {
+		if (choice == CHOICE_HAPPY_FACE) {
 			char eyes, nose, mouth;
-			int faceSize;
+			int faceSize, nosePadding;
 			printf("Enter symbols for the eyes, nose, and mouth:\n");
 			scanf(" %c %c %c", &eyes, &nose, &mouth);
 
@@ -51,7 +58,8 @@ int main() {
 
 			// Width of the face: faceSize + 2(eyes)
 			// Padding for the nose from the left: half of the face width, +1 since it's padding.
-			printf("%*c\n", ((faceSize + 1) / 2) + 1, nose);
+			nosePadding = ((faceSize + 1) / 2) + 1;
+			printf("%*c\n", nosePadding, nose);
 			printf("\\");
 
 			// Print the mouth <faceSize> times.
@@ -68,43 +76,53 @@ int main() {
 		Not blanced: 1552, 34
 		Please notice: the number has to be bigger than 0.
 		*/
-		else if (choice == 2) {
+		else if (choice == CHOICE_BALANCED) {
 			int number;
 			printf("Enter a number:\n");
 			scanf("%d", &number);
 
-			// input validation
+			// Ensure input is a positive number
 			while (number < 1) {
 				printf("Only positive number is allowed, please try again:\n");
 				scanf("%d", &number);
 			}
+
 			// We know how many digits the number has by dividing it by 10 each time.
-			int digitCounter = 0, i = number;
-			while (i > 0) {
+			// Once we reach zero, there are no digits left.
+			int digitCounter = 0, tempNumber = number;
+			while (tempNumber > 0) {
 				++digitCounter;
-				i = i / 10;
+				tempNumber = tempNumber / 10;
 			}
+
+			// No need to check singe digit numbers
 			if (digitCounter == 1) {
 				printf("This number is balanced and brings harmony!\n");
 			} else {
 				// Create the "divider" (10^[digitCounter/2])
 				int divider = 10;
+
+				// The amount of zeros the divider has, equals to half of the amount of digits the number has.
 				for (int j = 1; j < digitCounter / 2; ++j) {
 					divider = divider * 10;
 				}
 
-				// Get the halves. The number in the middle can be ignored.
+				// Get the right half. The digit in the middle can be ignored.
 				int rightHalf = number % divider;
 
-				// If the amount of digits is odd, we need to add another zero to the divider (we want to remove more
-				// than "half" of the numbers
+				// If the amount of digits is odd, we need to add another zero to the divider (we want to remove
+				// the middle digit as well.
 				if (digitCounter % 2 == 1) {
 					divider = divider * 10;
 				}
+
+				// Get the left half.
 				int leftHalf = number / divider;
 				int leftSum = 0, rightSum = 0;
 
-				// Get each digit. Add it to the relevant sum. Remove said digit from the half
+				// Get each digit. Add it to the relevant sum. Remove said digit from the half.
+				// %10 = get last digit
+				// /10 = remove last digit
 				while (leftHalf != 0) {
 					leftSum += leftHalf % 10;
 					leftHalf = leftHalf / 10;
@@ -113,6 +131,7 @@ int main() {
 					rightSum += rightHalf % 10;
 					rightHalf = rightHalf / 10;
 				}
+				// Finally, check if both sums are equal
 				if (leftSum == rightSum) {
 					printf("This number is balanced and brings harmony!\n");
 				} else {
@@ -126,19 +145,21 @@ int main() {
 		Not Abudant: 3, 7, 10
 		Please notice: the number has to be bigger than 0.
 		*/
-		else if (choice == 3) {
+		else if (choice == CHOICE_GENEROUS) {
 			int number;
 			printf("Enter a number:\n");
 			scanf("%d", &number);
 
-			// input validation
+			// Ensure input is a positive number
 			while (number < 1) {
 				printf("Only positive number is allowed, please try again:\n");
 				scanf("%d", &number);
 			}
 
-			// We can start with 1, since all numbers are dividable by 1.
+			// We can add 1 to the sum, since all numbers are dividable by 1.
 			int divisorsSum = 1;
+
+			// For all numbers from 2 onwards, check if given number is dividable by i.
 			for (int i = 2; i < number; ++i) {
 				if (number % i == 0) {
 					divisorsSum += i;
@@ -156,12 +177,12 @@ int main() {
 		This one does not bring joy: 15, 8, 99
 		Please notice: the number has to be bigger than 0.
 		*/
-		else if (choice == 4) {
+		else if (choice == CHOICE_CIRCLE_OF_JOY) {
 			int number, tempNumber, reverseNumber = 0, digit;
 			printf("Enter a number:\n");
 			scanf("%d", &number);
 
-			// input validation
+			// Ensure input is a positive number
 			while (number < 1) {
 				printf("Only positive number is allowed, please try again:\n");
 				scanf("%d", &number);
@@ -169,6 +190,9 @@ int main() {
 			// Calc the reverse number.
 			tempNumber = number;
 			while (tempNumber > 0) {
+
+				// Move the entire reverse number one digit to the left. Won't have an effect
+				// during the first run of the loop.
 				reverseNumber = reverseNumber * 10;
 
 				// Get the last digit
@@ -177,19 +201,22 @@ int main() {
 				// Add the digit to the end of our reverse number
 				reverseNumber += digit;
 
-				// Remove the last digit.
+				// Remove the last digit from the temp number.
 				tempNumber = tempNumber / 10;
 			}
+			// Flag
 			char isPrime = 1;
 
-			// To make the code fast, check if number is even, and then skip all even numbers.
-			if (number % 2 == 0 && reverseNumber % 2 == 0 && number != 2) {
+			// To make the code fast, check if number is even once, and then skip all even numbers.
+			if ((number % 2 == 0 || reverseNumber % 2 == 0) && number != 2) {
 				printf("The circle remains incomplete.\n");
 				isPrime = 0;
 			}
 			// Check if the given number is a prime:
 			if (isPrime) {
 				// We can stop at number / 2 (since after that, i*2 will be bigger than the given number)
+				// Also, start at i=3 since we already checked i=2
+				// Step = i+=2, since we want to skip even numbers
 				for (int i = 3; i < number / 2; i += 2) {
 					if (number % i == 0) {
 						isPrime = 0;
@@ -219,12 +246,12 @@ int main() {
 		Not Happy :( : 5, 9
 		Please notice: the number has to be bigger than 0.
 		*/
-		else if (choice == 5) {
+		else if (choice == CHOICE_HAPPY_NUMBERS) {
 			int number, tempNumber, digit, sum;
 			printf("Enter a number:\n");
 			scanf("%d", &number);
 
-			// input validation
+			// Ensure input is a positive number
 			while (number < 1) {
 				printf("Only positive number is allowed, please try again:\n");
 				scanf("%d", &number);
@@ -239,7 +266,11 @@ int main() {
 
 					// Go over all the digits in our new number and sum their squares.
 					while (tempNumber != 0) {
+
+						// %10 = get last digit
 						digit = tempNumber % 10;
+
+						// Add digit squared to sum
 						sum += digit * digit;
 
 						// Remove the last digit
@@ -248,8 +279,11 @@ int main() {
 					// The next number that we want to check is the current iteration's sum
 					tempNumber = sum;
 
-					// Stop at a digit that we recognize as either happy or sad, or at the original digit.
+				// Stop at a digit that we recognize as either happy (1) or sad (4), or at the original digit.
+				// (to stop an infinite loop)
 				} while (sum != 1 && sum != 4 && sum != i);
+
+				// As declared, when sum is 1, the number is happy. print it.
 				if (sum == 1) {
 					printf("%d ", i);
 				}
@@ -263,31 +297,27 @@ int main() {
 		/* Example:
 		6, smile: 2, cheer: 3 : 1, Smile!, Cheer!, Smile!, 5, Festival!
 		*/
-		else if (choice == 6) {
+		else if (choice == CHOICE_LAUGHTER) {
+
+			// Flag
 			char isInputValid = 0;
 			int smileNumber, cheerNumber, maxNumber;
 
 			printf("Enter a smile and cheer number:\n");
 			while (!isInputValid) {
-
 				// Get the two numbers in the expected format.
 				int goodValues = scanf("smile: %d , cheer: %d", &smileNumber, &cheerNumber);
 
 				// Clear buffer
-				do {
-					// Separated these to two lines, since putting them in one line causes an infinite loop when only
-					// \n is entered
-					bufferEmpty = scanf("%*[^\n]");
-					scanf("%*c");
-				} while (bufferEmpty == -1);
+				scanf("%*[^\n]");
+				scanf("%*c");
 
 				// Input was invalid
 				if (goodValues != 2) {
 					printf("Only 2 different positive numbers in the given format are allowed for the festival,"
 						" please try again:\n");
 				}
-
-				// Two identical numbers were entered
+				// Check if two identical numbers were entered
 				else if (smileNumber == cheerNumber) {
 					printf("Only 2 different positive numbers in the given format are allowed for the festival,"
 						" please try again:\n");
@@ -300,11 +330,12 @@ int main() {
 			printf("Enter maximum number for the festival:\n");
 			scanf("%d", &maxNumber);
 
-			// input validation
+			// Ensure input is a positive number
 			while (maxNumber < 1) {
 				printf("Only positive maximum number is allowed, please try again:\n");
 				scanf("%d", &maxNumber);
 			}
+			// Go over all numbers from 1 to maxNumber
 			for (int i = 1; i <= maxNumber; ++i) {
 				// Check if number is dividable by both numbers...
 				if (i % smileNumber == 0) {
@@ -315,7 +346,7 @@ int main() {
 						printf("Smile!\n");
 					}
 				}
-				// Check only cheer number
+				// Else, Check only cheer number
 				else if (i % cheerNumber == 0) {
 					printf("Cheer!\n");
 				}
@@ -324,7 +355,7 @@ int main() {
 					printf("%d\n", i);
 				}
 			}
-		} else if (choice == 7) {
+		} else if (choice == CHOICE_EXIT) {
 			printf("Thank you for your journey through Numeria!\n");
 		} else {
 			printf("This option is not available, please try again.\n");
